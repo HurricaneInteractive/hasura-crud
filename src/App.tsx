@@ -1,16 +1,14 @@
 import React, { FormEvent, useState } from 'react';
 import 'halfmoon/css/halfmoon-variables.min.css';
 
-import { string, object, InferType } from "yup"
-import { gql, useMutation, useQuery } from '@apollo/client';
-import Schema from './modules/schema/Schema';
+import { string, object } from "yup"
+import { useMutation, useQuery } from '@apollo/client';
+import schemas from './lib/schema';
 
 let schema = object().shape({
   username: string().required(),
   _id: string().required()
 })
-
-type BasicUser = InferType<typeof schema>
 
 const keys = Object.keys(schema?.fields || {})
 
@@ -18,30 +16,24 @@ const data = keys.reduce((acc, cur) => {
   return {...acc, [cur]: ""}
 }, {})
 
-const mutationAsAString = `mutation AddBasicUser($username: String!) {
-  insert_basic_user(objects: {username: $username}) {
-    returning {
-      _id
-    }
-  }
-}`
-
-const ADD_BASIC_USER = gql`${mutationAsAString}`
-
-const BasicUserSchema = Schema.create(schema, "basic_user")
-
 function App() {
   const [formData, setFormData] = useState<any>(data)
-  const [addBasicUser] = useMutation(ADD_BASIC_USER);
-  const { loading, error, data: BUData } = useQuery(BasicUserSchema.allRecords);
+  const [addBasicUser] = useMutation(schemas.basic_user.createOneQuery);
+  const { loading, error, data: BUData } = useQuery(schemas.basic_user.readByPKQuery, {
+    variables: {
+      id: 1
+    }
+  });
 
-  const submitForm = (e: FormEvent) => {
+  const submitForm = async (e: FormEvent) => {
     e.preventDefault()
-    addBasicUser({
+    const rtn = await addBasicUser({
       variables: {
         username: formData.username
       }
     })
+
+    console.log(rtn)
   }
 
   return (

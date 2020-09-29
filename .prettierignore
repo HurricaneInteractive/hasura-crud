@@ -1,0 +1,5 @@
+public/**/*
+src/serviceWorker.ts
+package.json
+**/*.test.ts
+build/**/*

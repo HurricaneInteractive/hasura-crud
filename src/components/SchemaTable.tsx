@@ -3,6 +3,7 @@ import { omit, pull } from "lodash-es"
 import React, { ReactElement } from "react"
 import { Link } from "react-router-dom"
 import schemas, { SchemaKeys } from "../lib/schema"
+import Alert from "./Alert"
 import LoadingTable from "./LoadingTable"
 
 type Props = {
@@ -10,17 +11,14 @@ type Props = {
 }
 
 const QueryError = ({ message }: { message: string }) => (
-	<div className="alert alert-danger filled-dm" role="alert">
-		<h4 className="alert-heading">Query error</h4>
-		{message}
-	</div>
+	<Alert title="Query error" content={message} type="danger" />
 )
 
 const NoData = (): ReactElement => (
-	<div className="alert filled-dm" role="alert">
-		<h4 className="alert-heading">No data found</h4>
-		No results were found, try adding a record to this schema
-	</div>
+	<Alert
+		title="No data found"
+		content="No results were found, try adding a record to this schema"
+	/>
 )
 
 function SchemaTable({ schema }: Props): ReactElement {

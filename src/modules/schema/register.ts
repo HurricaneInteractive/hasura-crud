@@ -14,18 +14,22 @@ type SchemasObject<K extends string> = Record<K, ObjectSchema>
  * @param {SchemasObject<K>} schemas
  * @returns {Record<K, Schema>}
  */
-function registerSchemas <K extends string>( schemas: SchemasObject<K>): Record<K, Schema> {
-  try {
-    const keys = Object.keys(schemas) as K[]
+function registerSchemas<K extends string>(
+	schemas: SchemasObject<K>
+): Record<K, Schema> {
+	try {
+		const keys = Object.keys(schemas) as K[]
 
-    return keys.reduce((acc, cur) => ({
-      ...acc,
-      [cur]: Schema.create(schemas[cur], cur)
-    }), {} as Record<K, Schema>)
-  }
-  catch (e) {
-    throw new Error(e)
-  }
+		return keys.reduce(
+			(acc, cur) => ({
+				...acc,
+				[cur]: Schema.create(schemas[cur], cur),
+			}),
+			{} as Record<K, Schema>
+		)
+	} catch (e) {
+		throw new Error(e)
+	}
 }
 
 export default registerSchemas

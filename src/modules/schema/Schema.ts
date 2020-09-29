@@ -4,10 +4,14 @@ import { create_one } from "./templates/create"
 import { get_all, get_by_pk } from "./templates/read"
 
 class Schema {
-	private validationSchema!: ObjectSchema
+	private _validationSchema!: ObjectSchema
+	public get validationSchema(): ObjectSchema {
+		return this._validationSchema
+	}
 
 	private tableName!: string
 	private schemaKeys: string[] = []
+
 	private _primaryKey: string = "_id"
 
 	public set primaryKey(value: string) {
@@ -43,7 +47,7 @@ class Schema {
 	//#endregion
 
 	private constructor(schema: ObjectSchema, tableName: string) {
-		this.validationSchema = schema
+		this._validationSchema = schema
 		this.tableName = tableName
 
 		this.generateSchemaKeys()
@@ -52,7 +56,7 @@ class Schema {
 	}
 
 	private generateSchemaKeys() {
-		this.schemaKeys = Object.keys(this.validationSchema?.fields || {})
+		this.schemaKeys = Object.keys(this._validationSchema?.fields || {})
 	}
 
 	private generateReadQueries() {

@@ -5,6 +5,8 @@ import registerSchemas from "../../modules/schema/register"
 export const BasicUserSchema = object().shape({
 	_id: string().notRequired(),
 	username: string().required(),
+	name: string().notRequired(),
+	email: string().required(),
 })
 
 const BasicUserTableName = "basic_user"

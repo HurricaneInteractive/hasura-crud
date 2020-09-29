@@ -14,4 +14,6 @@ const schemas = registerSchemas({
 	[BasicUserTableName]: BasicUserSchema,
 })
 
+export type SchemaKeys = keyof typeof schemas
+
 export default schemas

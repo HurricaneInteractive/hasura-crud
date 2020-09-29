@@ -1,6 +1,6 @@
 import { DocumentNode, gql } from "@apollo/client"
 import { ObjectSchema } from "yup"
-import { create_multiple, create_one } from "./templates/create"
+import { create_one } from "./templates/create"
 import { get_all, get_by_pk } from "./templates/read"
 
 class Schema {
@@ -15,6 +15,10 @@ class Schema {
 			this._primaryKey = value.trim()
 			this.generateCreateQueries()
 		}
+	}
+
+	get getPrimaryKey(): string {
+		return this._primaryKey
 	}
 
 	//#region Read Queries
@@ -32,14 +36,9 @@ class Schema {
 
 	//#region Create Queries
 	private _createOneQuery!: DocumentNode
-	private _createMultipleQuery!: DocumentNode
 
 	get createOneQuery(): DocumentNode {
 		return this._createOneQuery
-	}
-
-	get createMultipleQuery(): DocumentNode {
-		return this._createMultipleQuery
 	}
 	//#endregion
 
@@ -69,7 +68,21 @@ class Schema {
 		this._createOneQuery = gql`
 			${create_one(this.tableName, this.schemaKeys, this._primaryKey)}
 		`
-		// this._createMultipleQuery = gql`${create_multiple()}`
+	}
+
+	/**
+	 * Constructs the form structure based on the schema keys without the primary key
+	 *
+	 * @returns {Record<string, string>}
+	 * @memberof Schema
+	 */
+	public toFormData(): Record<string, string> {
+		// TODO: this might need to change to the schema fields to use different types
+		return this.schemaKeys.reduce((acc: Record<string, string>, cur) => {
+			if (cur === this._primaryKey) return acc
+
+			return { ...acc, [cur]: "" }
+		}, {})
 	}
 
 	public static create(schema: ObjectSchema, tableName: string) {

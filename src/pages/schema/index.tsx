@@ -1,22 +1,31 @@
 import React from "react"
-import { useParams } from "react-router-dom"
-import InvalidSchema from "../../components/InvalidSchema"
-import { hasBeenRegistered, schemaNiceName } from "../../modules/schema/utils"
+import { Link, useParams } from "react-router-dom"
+import SchemaTable from "../../components/SchemaTable"
+import withSchemaGuard from "../../components/withSchemaGuard"
+import { SchemaKeys } from "../../lib/schema"
+import { schemaNiceName } from "../../modules/schema/utils"
 
-type Params = {
-	schema: string
-}
-
-export default function SchemaIndex() {
-	const { schema } = useParams<Params>()
-
-	if (!hasBeenRegistered(schema)) {
-		return <InvalidSchema />
-	}
+const SchemaIndex = () => {
+	const { schema } = useParams<{ schema: string }>()
 
 	return (
-		<h1>
-			"<span className="text-capitalize">{schemaNiceName(schema)}</span>" Schema
-		</h1>
+		<>
+			<h1>
+				<span className="text-capitalize font-weight-bold">
+					{schemaNiceName(schema)}
+				</span>{" "}
+				Schema
+			</h1>
+			<div className="navbar mb-20">
+				<div className="d-flex ml-auto">
+					<Link to={`/${schema}/create`} className="btn btn-primary">
+						Create
+					</Link>
+				</div>
+			</div>
+			<SchemaTable schema={schema as SchemaKeys} />
+		</>
 	)
 }
+
+export default withSchemaGuard(SchemaIndex)

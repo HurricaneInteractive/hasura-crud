@@ -1,6 +1,7 @@
 import { DocumentNode, gql } from "@apollo/client"
 import { ObjectSchema } from "yup"
 import { create_one } from "./templates/create"
+import { delete_by_pk } from "./templates/delete"
 import { get_all, get_by_pk } from "./templates/read"
 
 class Schema {
@@ -46,6 +47,14 @@ class Schema {
 	}
 	//#endregion
 
+	//#region Delete Queries
+	private _deleteByPkQuery!: DocumentNode
+
+	get deleteByPkQuery(): DocumentNode {
+		return this._deleteByPkQuery
+	}
+	//#endregion
+
 	private constructor(schema: ObjectSchema, tableName: string) {
 		this._validationSchema = schema
 		this.tableName = tableName
@@ -53,6 +62,7 @@ class Schema {
 		this.generateSchemaKeys()
 		this.generateReadQueries()
 		this.generateCreateQueries()
+		this.generateDeleteQueries()
 	}
 
 	private generateSchemaKeys() {
@@ -71,6 +81,12 @@ class Schema {
 	private generateCreateQueries() {
 		this._createOneQuery = gql`
 			${create_one(this.tableName, this.schemaKeys, this._primaryKey)}
+		`
+	}
+
+	private generateDeleteQueries() {
+		this._deleteByPkQuery = gql`
+			${delete_by_pk(this.tableName, this._primaryKey)}
 		`
 	}
 

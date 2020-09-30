@@ -1,6 +1,6 @@
-import { useQuery } from "@apollo/client"
+import { useMutation, useQuery } from "@apollo/client"
 import { omit, pull } from "lodash-es"
-import React, { ReactElement } from "react"
+import React, { MouseEvent, ReactElement, useState } from "react"
 import { Link } from "react-router-dom"
 import schemas, { SchemaKeys } from "../lib/schema"
 import Alert from "./Alert"
@@ -22,11 +22,40 @@ const NoData = (): ReactElement => (
 )
 
 function SchemaTable({ schema }: Props): ReactElement {
-	const { loading, error, data } = useQuery(schemas[schema].readAllQuery)
+	const { loading, error, data, refetch } = useQuery(
+		schemas[schema].readAllQuery
+	)
+	const [deleteByPk] = useMutation(schemas[schema].deleteByPkQuery)
+	const [deleting, setDeleting] = useState(false)
 
 	if (loading) return <LoadingTable />
 
 	if (error) return <QueryError message={error.message} />
+
+	const deleteRecord = (id: string) => async (
+		e: MouseEvent<HTMLButtonElement>
+	) => {
+		e.preventDefault()
+
+		// eslint-disable-next-line no-restricted-globals
+		if (confirm("Are you sure you want to delete this record?")) {
+			setDeleting(true)
+
+			try {
+				await deleteByPk({
+					variables: {
+						id,
+					},
+				})
+				await refetch()
+			} catch (e) {
+				console.error(e)
+				alert(e.message)
+			} finally {
+				setDeleting(false)
+			}
+		}
+	}
 
 	const TableHead = (): ReactElement => {
 		const tableHeaderKeys = Object.keys(data[schema][0])
@@ -78,7 +107,13 @@ function SchemaTable({ schema }: Props): ReactElement {
 									>
 										Edit
 									</Link>
-									<button className="btn">Delete</button>
+									<button
+										className="btn"
+										onClick={deleteRecord(item[key])}
+										disabled={deleting}
+									>
+										Delete
+									</button>
 								</div>
 							</td>
 						</tr>
